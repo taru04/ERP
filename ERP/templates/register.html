@@ -1,0 +1,115 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Register</title>
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(135deg, #74ABE2, #5563DE);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+
+    .box {
+      width: 380px;
+      background: #ffffff;
+      padding: 28px;
+      border-radius: 16px;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+      text-align: center;
+      animation: fadeIn 0.8s ease;
+    }
+
+    h3 {
+      margin-bottom: 18px;
+      color: #2c3e50;
+    }
+
+    input {
+      width: 350px;
+      padding: 10px;
+      margin: 8px 0;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      font-size: 14px;
+      transition: border-color 0.3s ease;
+    }
+
+    input:focus {
+      border-color: #5563DE;
+      outline: none;
+    }
+
+    button {
+      width: 300px;
+      padding: 10px;
+      background: #5563DE;
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      font-size: 15px;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    button:hover {
+      background: #4050c4;
+    }
+
+    a {
+      color: #5563DE;
+      text-decoration: none;
+      font-size: 14px;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+
+    .flash {
+      background: #fff3cd;
+      border: 1px solid #ffeeba;
+      padding: 10px;
+      border-radius: 6px;
+      margin-bottom: 10px;
+      color: #856404;
+      font-size: 14px;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+  <div class="box">
+    <h3>Register</h3>
+
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+        <div class="flash">
+          {% for m in messages %}
+            {{ m }}<br>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+
+    <form method="post">
+      <input name="name" placeholder="Full Name" required>
+      <input name="email" placeholder="Email" required type="email">
+      <input name="password" placeholder="Password" required type="password">
+      <button type="submit">Register</button>
+    </form>
+
+    <p style="margin-top:10px;">
+      <a href="{{ url_for('login') }}">← Back to Login</a>
+    </p>
+  </div>
+</body>
+</html>

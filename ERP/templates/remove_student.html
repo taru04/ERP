@@ -1,0 +1,80 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Remove Student</title>
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(135deg, #74ABE2, #5563DE);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+
+    .box {
+      width: 480px;
+      background: #ffffff;
+      padding: 28px;
+      border-radius: 16px;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+      text-align: center;
+      animation: fadeIn 0.8s ease;
+    }
+
+    h3 {
+      color: #2c3e50;
+      margin-bottom: 12px;
+    }
+
+    p {
+      font-size: 15px;
+      color: #555;
+      margin-bottom: 24px;
+    }
+
+    button {
+      background: #dc3545;
+      color: #fff;
+      padding: 10px 18px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 15px;
+      transition: background 0.3s ease;
+    }
+
+    button:hover {
+      background: #b92c3a;
+    }
+
+    a {
+      margin-left: 10px;
+      color: #5563DE;
+      text-decoration: none;
+      font-weight: 500;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+  <div class="box">
+    <h3>Remove Student</h3>
+    <p>Are you sure you want to remove <strong>{{ student.name }}</strong> ({{ student.roll_no }})?</p>
+    <form method="post">
+      <button type="submit">Confirm Remove</button>
+      <a href="{{ url_for('teacher.dashboard') }}">Cancel</a>
+    </form>
+  </div>
+</body>
+</html>

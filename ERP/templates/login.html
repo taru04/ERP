@@ -1,0 +1,123 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>ERP Login</title>
+  <style>
+    body {
+      font-family: "Poppins", Arial, sans-serif;
+      background: linear-gradient(135deg, #4e73df, #1cc88a);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+
+    .box {
+      width: 380px;
+      padding: 28px 24px;
+      background: #ffffff;
+      border-radius: 12px;
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.15);
+      text-align: center;
+    }
+
+    h2 {
+      margin: 0 0 14px 0;
+      color: #333;
+    }
+
+    input {
+      width: 90%;
+      padding: 12px;
+      margin: 10px 0;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      font-size: 15px;
+    }
+
+    input:focus {
+      outline: none;
+      border-color: #4e73df;
+      box-shadow: 0 0 4px rgba(78, 115, 223, 0.3);
+    }
+
+    button {
+      width: 100%;
+      padding: 12px;
+      background: #4e73df;
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    button:hover {
+      background: #3b5fd8;
+    }
+
+    .small {
+      font-size: 13px;
+      color: #666;
+      margin-top: 10px;
+    }
+
+    .small a {
+      color: #1cc88a;
+      text-decoration: none;
+    }
+
+    .small a:hover {
+      text-decoration: underline;
+    }
+
+    .flash-msg {
+      background: #fff8e1;
+      border: 1px solid #ffeeba;
+      color: #856404;
+      padding: 10px;
+      border-radius: 6px;
+      margin-bottom: 12px;
+      text-align: left;
+    }
+
+    .sample {
+      background: #f8f9fc;
+      border-radius: 6px;
+      padding: 8px;
+      margin-top: 12px;
+      color: #444;
+      font-size: 13px;
+      line-height: 1.6;
+    }
+  </style>
+</head>
+<body>
+  <div class="box">
+    <h2>ERP Login</h2>
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+        <div class="flash-msg">
+          {% for m in messages %}{{m}}<br>{% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+    <form method="post">
+      <input name="email" type="email" placeholder="Email" required>
+      <input name="password" type="password" placeholder="Password" required>
+      <button>Login</button>
+    </form>
+    <div class="small">
+      <a href="{{ url_for('register') }}">Register</a> |
+      <a href="{{ url_for('index') }}">Home</a>
+    </div>
+    <div class="sample">
+      <b>Sample teacher:</b> teacher@erp.local<br>
+      <b>Sample student:</b> student@erp.local
+    </div>
+  </div>
+</body>
+</html>

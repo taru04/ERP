@@ -1,0 +1,232 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Mark Attendance</title>
+  <style>
+    body {
+      font-family: "Poppins", Arial, sans-serif;
+      background: linear-gradient(135deg, #4e73df, #1cc88a);
+      margin: 0;
+      padding: 0;
+      color: #333;
+    }
+
+    .wrap {
+      width: 100%;
+      max-width: 1000px;
+      margin: 40px auto;
+      background: #ffffff;
+      padding: 24px;
+      border-radius: 12px;
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.1);
+    }
+
+    h3 {
+      margin-top: 0;
+      color: #4e73df;
+      text-align: center;
+    }
+
+    form {
+      margin-bottom: 20px;
+    }
+
+    label {
+      margin-right: 14px;
+      font-weight: 500;
+      display: inline-block;
+    }
+
+    select, input[type="date"], input[type="text"] {
+      padding: 8px 10px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      font-size: 14px;
+      margin-left: 6px;
+      margin-right: 10px;
+      outline: none;
+      transition: all 0.3s;
+    }
+
+    select:focus, input:focus {
+      border-color: #4e73df;
+      box-shadow: 0 0 4px rgba(78, 115, 223, 0.3);
+    }
+
+    button {
+      width: 120px;
+      background: #4e73df;
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: background 0.3s;
+    }
+
+    button:hover {
+      background: #3b5fd8;
+    }
+
+    .table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 16px;
+      font-size: 14px;
+    }
+
+    .table th {
+      background: #4e73df;
+      color: white;
+      text-align: left;
+      padding: 10px;
+    }
+
+    .table td {
+      padding: 8px 10px;
+      border-bottom: 1px solid #eee;
+    }
+
+    .table tr:nth-child(even) {
+      background: #f8f9fc;
+    }
+
+    .table tr:hover {
+      background: #eef3ff;
+    }
+
+    a {
+      color: #1cc88a;
+      text-decoration: none;
+      font-weight: 500;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+
+    #studentsTable select {
+      border-radius: 4px;
+      padding: 5px;
+      border: 1px solid #ccc;
+    }
+
+    #studentsTable input {
+      padding: 5px;
+      border-radius: 4px;
+      border: 1px solid #ccc;
+    }
+
+    p {
+      text-align: center;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h3>📘 Mark Attendance</h3>
+
+    <form method="post" id="filterForm">
+      <label>Date:
+        <input type="date" name="date" value="{{ '' }}">
+      </label>
+      <label>Course:
+        <select id="courseSel" name="course_id">
+          <option value="">--Any--</option>
+          {% for c in courses %}
+            <option value="{{ c.id }}">{{ c.name }}</option>
+          {% endfor %}
+        </select>
+      </label>
+      <label>Branch:
+        <select id="branchSel" name="branch_id">
+          <option value="">--Any--</option>
+          {% for b in branches %}
+            <option value="{{ b.id }}">{{ b.name }}</option>
+          {% endfor %}
+        </select>
+      </label>
+      <label>Section:
+        <select id="sectionSel" name="section_id">
+          <option value="">--Any--</option>
+          {% for s in sections %}
+            <option value="{{ s.id }}">{{ s.name }}</option>
+          {% endfor %}
+        </select>
+      </label>
+      <button type="button" onclick="loadStudents()">Load Students</button>
+      <button type="submit">Save Attendance</button>
+    </form>
+
+    <form method="post" id="attendanceForm">
+      <input type="hidden" name="date" id="hiddenDate">
+      <table class="table" id="studentsTable">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Name</th>
+            <th>Roll</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td colspan="5">Load students using filters above.</td></tr>
+        </tbody>
+      </table>
+    </form>
+
+    <p><a href="{{ url_for('teacher.dashboard') }}">⬅ Back to Dashboard</a></p>
+  </div>
+
+  <script>
+    async function loadStudents(){
+      const course = document.getElementById('courseSel').value;
+      const branch = document.getElementById('branchSel').value;
+      const section = document.getElementById('sectionSel').value;
+      const dateInput = document.querySelector('input[name="date"]').value || new Date().toISOString().slice(0,10);
+      document.getElementById('hiddenDate').value = dateInput;
+
+      const params = new URLSearchParams();
+      if(course) params.append("course_id", course);
+      if(branch) params.append("branch_id", branch);
+      if(section) params.append("section_id", section);
+
+      const res = await fetch(`/teacher/students_by_filter?${params.toString()}`);
+      const students = await res.json();
+      const tbody = document.querySelector("#studentsTable tbody");
+      tbody.innerHTML = "";
+      if(students.length === 0){
+        tbody.innerHTML = "<tr><td colspan='5'>No students for selected group.</td></tr>";
+        return;
+      }
+      let idx = 1;
+      for(const s of students){
+        const tr = document.createElement('tr');
+        tr.innerHTML = `<td>${idx++}</td>
+                        <td>${s.name}</td>
+                        <td>${s.roll_no}</td>
+                        <td>
+                          <select name="status_${s.id}">
+                            <option value="Present">Present</option>
+                            <option value="Absent">Absent</option>
+                            <option value="Late">Late</option>
+                          </select>
+                        </td>
+                        <td><input name="remarks_${s.id}" placeholder="Remarks"></td>`;
+        tbody.appendChild(tr);
+      }
+
+      document.getElementById('attendanceForm').action = window.location.pathname;
+      document.getElementById('filterForm').onsubmit = function(e){
+        e.preventDefault();
+        const dateVal = document.querySelector('input[name="date"]').value || new Date().toISOString().slice(0,10);
+        document.getElementById('hiddenDate').value = dateVal;
+        document.getElementById('attendanceForm').submit();
+      };
+    }
+  </script>
+</body>
+</html>

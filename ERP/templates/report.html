@@ -1,0 +1,179 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Attendance Report</title>
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(135deg, #74ABE2, #5563DE);
+      margin: 0;
+      padding: 40px 20px;
+      display: flex;
+      justify-content: center;
+    }
+
+    .card {
+      background: #fff;
+      padding: 24px;
+      border-radius: 16px;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+      width: 80%;
+      max-width: 950px;
+      animation: fadeIn 0.8s ease;
+    }
+
+    h3 {
+      text-align: center;
+      color: #2c3e50;
+      margin-bottom: 20px;
+    }
+
+    .btn {
+      padding: 10px 16px;
+      background: #007bff;
+      color: #fff;
+      border-radius: 6px;
+      text-decoration: none;
+      font-weight: 500;
+      transition: background 0.3s ease;
+      cursor: pointer;
+      border: none;
+    }
+
+    .btn:hover {
+      background: #0056b3;
+    }
+
+    .nav-links {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .nav-links a {
+      color: #5563DE;
+      text-decoration: none;
+      margin-left: 12px;
+      font-weight: 500;
+    }
+
+    .nav-links a:hover {
+      text-decoration: underline;
+    }
+
+    form {
+      text-align: center;
+      margin-bottom: 25px;
+    }
+
+    input[type="date"], select {
+      padding: 8px 12px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      font-size: 14px;
+      margin-right: 10px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    th, td {
+      padding: 12px;
+      border-bottom: 1px solid #ddd;
+      text-align: center;
+    }
+
+    th {
+      background-color: #5563DE;
+      color: #fff;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f9f9f9;
+    }
+
+    tr:hover {
+      background-color: #eef3ff;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h3>Attendance Report</h3>
+
+    <div class="nav-links">
+      <a href="{{ url_for('index') }}">🏠 Home</a>
+    </div>
+
+    <!-- 🔹 Filter Form -->
+    <form method="GET" action="{{ url_for('report.view_report') }}">
+      <input type="date" name="selected_date" required value="{{ request.args.get('selected_date', '') }}">
+      
+      <select name="branch" required>
+        <option value="">Select Branch</option>
+        <option value="CSE" {% if request.args.get('branch') == 'CSE' %}selected{% endif %}>CSE</option>
+        <option value="ECE" {% if request.args.get('branch') == 'ECE' %}selected{% endif %}>ECE</option>
+        <option value="ME" {% if request.args.get('branch') == 'ME' %}selected{% endif %}>ME</option>
+      </select>
+
+      <select name="course" required>
+        <option value="">Select Course</option>
+        <option value="BTech" {% if request.args.get('course') == 'BTech' %}selected{% endif %}>BTech</option>
+        <option value="MTech" {% if request.args.get('course') == 'MTech' %}selected{% endif %}>MTech</option>
+      </select>
+
+      <select name="section" required>
+        <option value="">Select Section</option>
+        <option value="A" {% if request.args.get('section') == 'A' %}selected{% endif %}>A</option>
+        <option value="B" {% if request.args.get('section') == 'B' %}selected{% endif %}>B</option>
+        <option value="C" {% if request.args.get('section') == 'C' %}selected{% endif %}>C</option>
+      </select>
+
+      <button class="btn" type="submit">View Report</button>
+
+      {% if rows %}
+        <a class="btn" href="{{ url_for('report.export_report', type='csv', date=request.args.get('selected_date'), branch=request.args.get('branch'), course=request.args.get('course'), section=request.args.get('section')) }}">📄 Export CSV</a>
+      {% endif %}
+    </form>
+
+    <!-- 🔹 Report Table -->
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Roll No</th>
+          <th>Branch</th>
+          <th>Course</th>
+          <th>Section</th>
+          <th>Date</th>
+          <th>Status</th>    
+      </thead>
+      <tbody>
+        {% for r in rows %}
+          <tr>
+            <td>{{ r.name }}</td>
+            <td>{{ r.roll_no }}</td>
+            <td>{{ r.branch }}</td>
+            <td>{{ r.course }}</td>
+            <td>{{ r.section }}</td>
+            <td>{{ r.date }}</td>
+            <td>{{ r.status }}</td>
+          </tr>
+        {% else %}
+          <tr><td colspan="8">No records found for selected filters</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</body>
+</html>

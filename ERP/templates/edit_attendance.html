@@ -1,0 +1,116 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Edit Attendance</title>
+  <style>
+    body {
+      font-family: "Poppins", Arial, sans-serif;
+      background: linear-gradient(135deg, #4e73df, #1cc88a);
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      color: #333;
+    }
+
+    .box {
+      width: 520px;
+      background: #ffffff;
+      padding: 24px;
+      border-radius: 12px;
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.1);
+    }
+
+    h3 {
+      margin-top: 0;
+      color: #4e73df;
+      text-align: center;
+      margin-bottom: 16px;
+    }
+
+    p strong {
+      color: #1cc88a;
+    }
+
+    form {
+      margin-top: 10px;
+    }
+
+    label {
+      font-weight: 500;
+      color: #444;
+    }
+
+    select, input {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      font-size: 14px;
+      margin-top: 6px;
+      transition: 0.3s;
+      outline: none;
+    }
+
+    select:focus, input:focus {
+      border-color: #4e73df;
+      box-shadow: 0 0 4px rgba(78, 115, 223, 0.3);
+    }
+
+    button {
+      width: 100%;
+      padding: 10px;
+      background: #4e73df;
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      font-size: 15px;
+      cursor: pointer;
+      margin-top: 10px;
+      transition: background 0.3s;
+    }
+
+    button:hover {
+      background: #3b5fd8;
+    }
+
+    a {
+      color: #1cc88a;
+      text-decoration: none;
+      font-weight: 500;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+
+    .back {
+      text-align: center;
+      margin-top: 14px;
+    }
+  </style>
+</head>
+<body>
+  <div class="box">
+    <h3>✏️ Edit Attendance</h3>
+    <p><strong>{{ att.name }}</strong> ({{ att.roll_no }}) — Date: {{ att.date }}</p>
+    <form method="post">
+      <label>Status:
+        <select name="status">
+          <option value="Present" {% if att.status=='Present' %}selected{% endif %}>Present</option>
+          <option value="Absent" {% if att.status=='Absent' %}selected{% endif %}>Absent</option>
+          <option value="Late" {% if att.status=='Late' %}selected{% endif %}>Late</option>
+        </select>
+      </label>
+
+      <input name="remarks" value="{{ att.remarks }}" placeholder="Remarks">
+
+      <button type="submit">Update Attendance</button>
+    </form>
+    <p class="back"><a href="{{ url_for('teacher.dashboard') }}">⬅ Back to Dashboard</a></p>
+  </div>
+</body>
+</html>

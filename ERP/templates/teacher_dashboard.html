@@ -1,0 +1,226 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Teacher Dashboard</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(135deg, #74ABE2, #5563DE);
+      margin: 0;
+      padding: 0;
+    }
+
+    /* Navbar */
+    .navbar {
+      background: #2c3e50;
+      color: #fff;
+      padding: 14px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    .navbar .left {
+      font-size: 18px;
+      font-weight: 600;
+    }
+
+    .navbar .right a {
+      color: #fff;
+      text-decoration: none;
+      margin-left: 18px;
+      font-weight: 500;
+      transition: color 0.3s ease;
+    }
+
+    .navbar .right a:hover {
+      color: #74ABE2;
+    }
+
+    .main {
+      max-width: 1100px;
+      margin: 40px auto;
+      background: #fff;
+      border-radius: 12px;
+      padding: 20px 30px;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+      animation: fadeIn 0.8s ease;
+    }
+
+    h2 {
+      color: #2c3e50;
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .card {
+      background: #f9fafc;
+      padding: 18px;
+      border-radius: 10px;
+      margin-bottom: 20px;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+    }
+
+    .card h4 {
+      color: #2c3e50;
+      margin-bottom: 10px;
+    }
+
+    input, select {
+      padding: 8px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      margin-right: 8px;
+      margin-bottom: 8px;
+    }
+
+    .btn {
+      padding: 8px 12px;
+      background: #5563DE;
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      text-decoration: none;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+
+    .btn:hover {
+      background: #3b4cc0;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+    }
+
+    th, td {
+      padding: 10px;
+      text-align: center;
+      border-bottom: 1px solid #ddd;
+    }
+
+    th {
+      background: #5563DE;
+      color: white;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f2f4ff;
+    }
+
+    tr:hover {
+      background-color: #eef2ff;
+    }
+
+    .small {
+      font-size: 13px;
+      color: #555;
+      margin-top: 6px;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Navigation Bar -->
+  <div class="navbar">
+    <div class="left">
+      👨‍🏫 {{ session.user_name }}
+    </div>
+    <div class="right">
+      <a href="{{ url_for('teacher.dashboard') }}">Dashboard</a>
+      <a href="{{ url_for('attendance.mark_attendance') }}">Mark Attendance</a>
+      <a href="{{ url_for('report.view_report') }}">Reports</a>
+      <a href="{{ url_for('logout') }}">Logout</a>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="main">
+    <h2>Teacher Dashboard</h2>
+
+    <!-- Add Course/Branch/Section -->
+    <div class="card">
+      <h4>Add Course / Branch / Section</h4>
+      <form method="post" action="{{ url_for('teacher.add_course') }}" style="display:inline-block;">
+        <input name="course_name" placeholder="Course name" required>
+        <button class="btn">Add Course</button>
+      </form>
+
+      <form method="post" action="{{ url_for('teacher.add_branch') }}" style="display:inline-block;">
+        <input name="branch_name" placeholder="Branch name" required>
+        <button class="btn">Add Branch</button>
+      </form>
+
+      <form method="post" action="{{ url_for('teacher.add_section') }}" style="display:inline-block;">
+        <input name="section_name" placeholder="Section name" required>
+        <button class="btn">Add Section</button>
+      </form>
+    </div>
+
+    <!-- Students Table -->
+    <div class="card">
+      <h4>Students (All)</h4>
+      <a class="btn" href="{{ url_for('teacher.add_student') }}">+ Add Student</a>
+      <table>
+        <thead>
+          <tr><th>#</th><th>Name</th><th>Roll</th><th>Course</th><th>Branch</th><th>Section</th><th>Actions</th></tr>
+        </thead>
+        <tbody>
+          {% for s in students %}
+          <tr>
+            <td>{{ loop.index }}</td>
+            <td>{{ s.name }}</td>
+            <td>{{ s.roll_no }}</td>
+            <td>{{ s.course_name or '-' }}</td>
+            <td>{{ s.branch_name or '-' }}</td>
+            <td>{{ s.section_name or '-' }}</td>
+            <td>
+              <a class="btn" href="{{ url_for('teacher.remove_student', sid=s.id) }}">Remove</a>
+            </td>
+          </tr>
+          {% else %}
+          <tr><td colspan="7">No students yet.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Attendance Stats -->
+    <div class="card">
+      <h4>Attendance Stats (Percent Present)</h4>
+      <canvas id="statsChart" height="80"></canvas>
+      <p class="small">(Chart shows % present per student)</p>
+    </div>
+  </div>
+
+  <script>
+    async function loadStats(){
+      try{
+        const res = await fetch("{{ url_for('teacher.students_by_filter') }}");
+        const students = await res.json();
+        const labels = students.map(s=>s.name);
+        const data = labels.map(()=>Math.floor(Math.random()*100)); // dummy data
+        const ctx = document.getElementById('statsChart').getContext('2d');
+        new Chart(ctx, {
+          type:'bar',
+          data:{ labels, datasets:[{ label:'% Present', data, backgroundColor:'#5563DE' }] },
+          options:{ scales:{ y:{ beginAtZero:true, max:100 } } }
+        });
+      }catch(e){
+        console.log(e);
+      }
+    }
+    loadStats();
+  </script>
+</body>
+</html>
